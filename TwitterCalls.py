@@ -19,34 +19,42 @@ def authenticate():
 	host = 'api.twitter.com'
 	url = '/oauth2/token/'
 
-	headers = {'Host':host,'User-Agent':'My Twitter 1.1','Authorization':'Basic %s' % encodedAuth,
+	header = {'Host':host,'User-Agent':'My Twitter 1.1','Authorization':'Basic %s' % encodedAuth,
 	'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','Content-Length':'29',
 	'Accept-Encoding':'gzip'}
 
-	params=urllib.urlencode({'grant_type':'client_credentials'})
+	param='{grant_type:client_credentials}'
 
-	r=requests.post('http://api.twitter.com/oauth2/token',headers=headers)
-	print r.status_code
-	# params = urllib.urlencode({'grant_type' : 'client_credentials'})
-	# req = httplib.HTTPSConnection(host)
-	# req.putrequest("POST", url)
-	# req.putheader("Host", host)
-	# req.putheader("User-Agent", "My Twitter 1.1")
-	# req.putheader("Authorization", "Basic %s" % encodedAuth)
-	# req.putheader("Content-Type" ,"application/x-www-form-urlencoded;charset=UTF-8")
-	# req.putheader("Content-Length", "29")
-	# req.putheader("Accept-Encoding", "gzip")
-	# req.endheaders()
-	# req.send(params)
+	# r=requests.post('http://api.twitter.com/oauth2/token',headers=header,params=param)
+	# print r.status_code
+	params = urllib.urlencode({'grant_type' : 'client_credentials'})
+	req = httplib.HTTPSConnection(host)
+	req.putrequest("POST", url)
+	req.putheader("Host", host)
+	req.putheader("User-Agent", "My Twitter 1.1")
+	req.putheader("Authorization", "Basic %s" % encodedAuth)
+	req.putheader("Content-Type" ,"application/x-www-form-urlencoded;charset=UTF-8")
+	req.putheader("Content-Length", "29")
+	req.putheader("Accept-Encoding", "gzip")
+	req.endheaders()
+	req.send(params)
 
-	# resp = req.getresponse()
-	# respread=resp.read()
-	# respdecode=respread.decode("UTF-8")
-	# print respdecode
+	resp = req.getresponse()
+	print resp.read()
 
 	# 	print 'oauth error', e
 	
 def findArticlePosters(url):
-	return null
+	authenticate()
+	return url
 
-authenticate()
+def userStream(users):
+	return users
+
+def followers(users):
+	return users
+
+def findArticleLinks(rankedUsers):
+	return rankedUsers
+
+
