@@ -14,10 +14,12 @@ from sys import argv
 textInput = TextParser.textParserOutput(argv)
 topic = TopicEngine.findTopic(textInput)
 
-users = TwitterCalls.findArticlePosters(argv)
+users = TwitterCalls.findArticlePosters()
 rankedUsers = UserRanking.relevantPosters(users)
 
 articleLinks = TwitterCalls.findArticleLinks(rankedUsers)
 
 #run topic model on given article
+
+
 

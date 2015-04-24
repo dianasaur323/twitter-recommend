@@ -2,17 +2,21 @@
 
 from urlparse import urlparse
 import urllib
-import urllib2
-import httplib
 import base64
 import requests
-import twitter
+import json
+import gzip
+
+from DataStructures import TwitterPost
+
+
+# Global authentication
+CONSUMER_KEY = "Xh0V9aWVmLLTPooWv14EkVBLo"
+CONSUMER_SECRET = "uoPiycXVTwrXgdR4hHM8hAH5z7rpMZwUdDeKqoy4rp8LOf3XP2"
 
 def authenticate():
-	CONSUMER_KEY = "Xh0V9aWVmLLTPooWv14EkVBLo"
-	CONSUMER_SECRET = "uoPiycXVTwrXgdR4hHM8hAH5z7rpMZwUdDeKqoy4rp8LOf3XP2"
-	# accessTokenKey = "1648117658-UzlogTNYnYPkHkskdRea5fRn7wc9ikIgP321RVi"
-	# accessTokenSecret = "C5LlHEcsZcWJJdhcDKSgQD0Mq36NcdqT0PABurMx2VzS6"
+
+	# pre-process keys
 
 	consumerKey = urlparse(CONSUMER_KEY)
 	consumerSecret = urlparse(CONSUMER_SECRET)
@@ -20,60 +24,94 @@ def authenticate():
 	combinedAuth = consumerKey[2] + ":" + consumerSecret[2]
 	encodedAuth = base64.b64encode(combinedAuth)
 
-	# host = 'api.twitter.com'
-	# url = '/oauth2/token/'
-
-
-
-	# params = urllib.urlencode({'grant_type' : 'client_credentials'})
-	# req = httplib.HTTPSConnection(host)
-	# req.putrequest("POST", url)
-	# req.putheader("Host", host)
-	# req.putheader("User-Agent", "My Twitter 1.1")
-	# req.putheader("Authorization", "Basic %s" % encodedAuth)
-	# req.putheader("Content-Type" ,"application/x-www-form-urlencoded;charset=UTF-8")
-	# req.putheader("Content-Length", "29")
-	# req.putheader("Accept-Encoding", "gzip")
-	# req.endheaders()
-	# req.send(params)
-
-	# resp = req.getresponse()
-	# response = resp.json()
-	# print resp.status,resp.reason, response
-
-	# param = 'grant_type=client_credentials'
-
-	# header = {'Post':url,'Host':host,'User-Agent':'My Twitter 1.1','Authorization':'Basic %s' % encodedAuth,
-	# 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','Content-Length':'29',
-	# 'Accept-Encoding':'gzip'}
-	# r=requests.post('http://api.twitter.com/oauth2/token',headers=header,params=param)
-	# print r.status_code
-
 	# get bearer token for application only requests
 
 	url = 'https://api.twitter.com/oauth2/token'
 	headers = {
-	    'Authorization': 'Basic {}'.format(encodedAuth),
-	    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+		'Authorization': 'Basic {}'.format(encodedAuth),
+		'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
 		}
 	data = 'grant_type=client_credentials'
 	response = requests.post(url, headers=headers, data=data)
 	response_data = response.json()
 	if response_data['token_type'] == 'bearer':
-	    bearer_token = response_data['access_token']
-	    print response.status_code
+		bearer_token = response_data['access_token']
 	else:
-	    raise RuntimeError('unexpected token type: {}'.format(response_data['token_type']))
+		raise RuntimeError('unexpected token type: {}'.format(response_data['token_type']))
 
+	authorizedHeader = {
+		'Authorization':'Bearer {}'.format(bearer_token),
+		'Accept-Encoding':'gzip',
+	}
 
-	# 	print 'oauth error', e
+	return authorizedHeader
 	
-def findArticlePosters(url):
-	authenticate()
-	return url
+def findArticlePosters(url_request):
+	# First run authentication to allow Twitter pulls
+	authorizedHeader = authenticate()
 
-def userStream(users):
-	return users
+	# Twitter pulls for tweets containing url
+	url = 'https://api.twitter.com/1.1/search/tweets.json'
+	params = {'q':url_request}
+	response = requests.get(url,headers=authorizedHeader, params=params)
+	response_data=response.json()['statuses']
+
+	# Define list that will contain results from Twitter call in the form of TwitterPost instances
+	returnedTweets = []
+
+	for doc in response_data:
+		twitterPost = TwitterPost(doc['id'])
+		twitterPost.set_user((doc['user'])['screen_name'])
+		twitterPost.set_user_id((doc['user'])['id'])
+		twitterPost.set_retweet(doc['retweet_count'])
+		for doc in (doc['entities'])['hashtags']:
+			twitterPost.set_hashtags(doc['text'])
+		returnedTweets.append(twitterPost)
+		print twitterPost.print_string()
+
+	return returnedTweets
+
+findArticlePosters('www.newyorker.com')
+
+def parseTweets(response_data):
+	
+	returnedTweets=[]
+
+	for doc in response_data:
+		twitterPost = TwitterPost(doc['id'])
+		twitterPost.set_user((doc['user'])['screen_name'])
+		twitterPost.set_user_id((doc['user'])['id'])
+		twitterPost.set_retweet(doc['retweet_count'])
+		for doc in (doc['entities'])['hashtags']:
+			twitterPost.set_hashtags(doc['text'])
+		returnedTweets.append(twitterPost)
+		print twitterPost.print_string()
+
+	return returnedTweets
+	
+def userStream(tweets):
+
+	url = "https://api.twitter.com/1.1/statuses/user_timeline.json"
+
+	# First run authentication to allow Twitter pulls
+	authorizedHeader = authenticate()
+
+	user_list = []
+
+	# Parse through tweets to get users
+	for tweet in tweets:
+		user_list.append(tweet.get_user_id())
+
+	# Twitter pulls for tweets related to user
+	for user in user_list:
+		params = {'user_id':user}
+		response = requests.get(url,headers=authorizedHeader,params=params)
+		response_data = response.json()
+		
+
+	return user_list
+
+userStream(findArticlePosters('www.newyorker.com'))
 
 def followers(users):
 	return users
@@ -81,6 +119,5 @@ def followers(users):
 def findArticleLinks(rankedUsers):
 	return rankedUsers
 
-authenticate()
 
 
