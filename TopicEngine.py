@@ -26,7 +26,7 @@ def scrapeNYT ():
     while date_range > 0:
 
         #iterate through page numbers
-        for i in range(1,100):
+        for i in range(1,2): #change to 100 when ready
             response = requests.get(url+'&begin_date='+str(search_date)+'&end_date='+
                 str(search_date)+'&fl=lead_paragraph'+'&page='+str(i)+'&api-key='+api_key)
             response_data = response.json()
@@ -38,13 +38,43 @@ def scrapeNYT ():
             else:
                 article_text=response_data['response']['docs']
                 article_list.append(article_text)
-                print article_text
 
         #iterate through dates
         date_range -=1 
         search_date -=1
 
-def trainTopicEngine (args):
+    # Print result to text file
+    text_file = open('NYT_articles.txt','a')
+    text_file.write(str(article_list))
+
+# Will return article_list as a dict with word occurrence count across the corpus
+def preprocessTopicEngine ():
+
+    #dict that stores each word and the number of occurrences
+    article_word_dict = {}
+
+    article_list = eval(open('NYT_articles.txt','r').read())
+
+    for doc in article_list:
+        # I know this is ugly - will fix
+        doc_text = str(doc[0]['lead_paragraph'])
+        doc_text = doc_text.replace('.',' ').replace('!', ' ').replace('?', ' ').replace('-', ' ') \
+        .replace('%', ' ').replace("'s"," ").replace('(',' ').replace(')',' ').replace('0', ' ') \
+        .replace('1', ' ').replace('2', ' ').replace('3', ' ').replace('4', ' ') .replace('5', ' ') \
+        .replace('6', ' ').replace('7', ' ').replace('8', ' ').replace('9', ' ')
+
+        word_list=doc_text.split()
+
+    for word in word_list:
+        if word in article_word_dict.keys():
+            article_word_dict[word]=article_word_dict.get(word) + 1
+        else:
+            article_word_dict[word] = 1
+
+    print article_word_dict
+
+def trainTopicEngine (article_list):
+
 	return args
 
 def findTopic (textInput):
@@ -52,4 +82,6 @@ def findTopic (textInput):
 
 def matchTopic (hashtags):
 	return hashtags
+
+preprocessTopicEngine()
 

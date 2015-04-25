@@ -45,33 +45,6 @@ def authenticate():
 	}
 
 	return authorizedHeader
-	
-def findArticlePosters(url_request):
-	# First run authentication to allow Twitter pulls
-	authorizedHeader = authenticate()
-
-	# Twitter pulls for tweets containing url
-	url = 'https://api.twitter.com/1.1/search/tweets.json'
-	params = {'q':url_request}
-	response = requests.get(url,headers=authorizedHeader, params=params)
-	response_data=response.json()['statuses']
-
-	# Define list that will contain results from Twitter call in the form of TwitterPost instances
-	returnedTweets = []
-
-	for doc in response_data:
-		twitterPost = TwitterPost(doc['id'])
-		twitterPost.set_user((doc['user'])['screen_name'])
-		twitterPost.set_user_id((doc['user'])['id'])
-		twitterPost.set_retweet(doc['retweet_count'])
-		for doc in (doc['entities'])['hashtags']:
-			twitterPost.set_hashtags(doc['text'])
-		returnedTweets.append(twitterPost)
-		print twitterPost.print_string()
-
-	return returnedTweets
-
-findArticlePosters('www.newyorker.com')
 
 def parseTweets(response_data):
 	
@@ -85,10 +58,25 @@ def parseTweets(response_data):
 		for doc in (doc['entities'])['hashtags']:
 			twitterPost.set_hashtags(doc['text'])
 		returnedTweets.append(twitterPost)
-		print twitterPost.print_string()
+		# print twitterPost.print_string()
 
 	return returnedTweets
 	
+def findArticlePosters(url_request):
+	# First run authentication to allow Twitter pulls
+	authorizedHeader = authenticate()
+
+	# Twitter pulls for tweets containing url
+	url = 'https://api.twitter.com/1.1/search/tweets.json'
+	params = {'q':url_request}
+	response = requests.get(url,headers=authorizedHeader, params=params)
+	response_data=response.json()['statuses']
+
+	# Define list that will contain results from Twitter call in the form of TwitterPost instances
+	return parseTweets(response_data)
+
+findArticlePosters('www.newyorker.com')
+
 def userStream(tweets):
 
 	url = "https://api.twitter.com/1.1/statuses/user_timeline.json"
