@@ -59,7 +59,6 @@ def parseTweets(response_data):
 			twitterPost.set_hashtags(doc['text'])
 		returnedTweets.append(twitterPost)
 		# print twitterPost.print_string()
-
 	return returnedTweets
 	
 def findArticlePosters(url_request):

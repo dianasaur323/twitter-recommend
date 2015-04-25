@@ -3,8 +3,12 @@
 import TopicEngine
 import TwitterCalls
 
+# Returns inverse document frequency
+def compute_training_tfidf (key):
+	return key
+
 def rankUsers (tweetStream):
-	TwitterCalls.followers(()
+	TwitterCalls.followers(())
 	return tweetStream
 
 def pullHashTags (tweetStream):

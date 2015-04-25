@@ -4,6 +4,7 @@
 
 import requests
 import json
+import tfidf
 
 
 def scrapeNYT ():
@@ -61,17 +62,15 @@ def preprocessTopicEngine ():
         doc_text = doc_text.replace('.',' ').replace('!', ' ').replace('?', ' ').replace('-', ' ') \
         .replace('%', ' ').replace("'s"," ").replace('(',' ').replace(')',' ').replace('0', ' ') \
         .replace('1', ' ').replace('2', ' ').replace('3', ' ').replace('4', ' ') .replace('5', ' ') \
-        .replace('6', ' ').replace('7', ' ').replace('8', ' ').replace('9', ' ')
+        .replace('6', ' ').replace('7', ' ').replace('8', ' ').replace('9', ' ')p
 
-        word_list=doc_text.split()
+        word_list=list(set(doc_text.split()))
 
-    for word in word_list:
-        if word in article_word_dict.keys():
-            article_word_dict[word]=article_word_dict.get(word) + 1
-        else:
-            article_word_dict[word] = 1
-
-    print article_word_dict
+        for word in word_list:
+            if word in article_word_dict.keys():
+                article_word_dict[word]=article_word_dict.get(word) + 1
+            else:
+                article_word_dict[word] = 1
 
 def trainTopicEngine (article_list):
 
