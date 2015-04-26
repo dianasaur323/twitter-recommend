@@ -10,17 +10,19 @@ import tfidf
 #accepts argv from terminal - input should be a web url
 from sys import argv
 
-#run topic model on given article
+if argv == "train":
+	# run the training engine that will topic model NYT documents
+	topic_tfidf = tfidf()
+	scrapeNYT()
+	preprocessTopicEngine(topic_tfidf)
 
-textInput = TextParser.textParserOutput(argv)
-topic = TopicEngine.findTopic(textInput)
+else:
+	inv_doc_freq("term",1)
 
-users = TwitterCalls.findArticlePosters()
-rankedUsers = UserRanking.relevantPosters(users)
+# textInput = TextParser.textParserOutput(argv)
+# topic = TopicEngine.findTopic(textInput)
 
-articleLinks = TwitterCalls.findArticleLinks(rankedUsers)
+# users = TwitterCalls.findArticlePosters()
+# rankedUsers = UserRanking.relevantPosters(users)
 
-#run topic model on given article
-
-
-
+# articleLinks = TwitterCalls.findArticleLinks(rankedUsers)

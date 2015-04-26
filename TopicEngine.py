@@ -4,7 +4,6 @@
 
 import requests
 import json
-import tfidf
 
 
 def scrapeNYT ():
@@ -48,29 +47,26 @@ def scrapeNYT ():
     text_file = open('NYT_articles.txt','a')
     text_file.write(str(article_list))
 
+
 # Will return article_list as a dict with word occurrence count across the corpus
-def preprocessTopicEngine ():
+def preprocessTopicEngine (topic_tfidf):
 
     #dict that stores each word and the number of occurrences
-    article_word_dict = {}
 
     article_list = eval(open('NYT_articles.txt','r').read())
+    word_list = []
 
     for doc in article_list:
         # I know this is ugly - will fix
         doc_text = str(doc[0]['lead_paragraph'])
-        doc_text = doc_text.replace('.',' ').replace('!', ' ').replace('?', ' ').replace('-', ' ') \
-        .replace('%', ' ').replace("'s"," ").replace('(',' ').replace(')',' ').replace('0', ' ') \
-        .replace('1', ' ').replace('2', ' ').replace('3', ' ').replace('4', ' ') .replace('5', ' ') \
-        .replace('6', ' ').replace('7', ' ').replace('8', ' ').replace('9', ' ')p
+        if doc_text != "None":
+            word_list = word_list + topic_tfidf.return_word_list (doc_text)
+            topic_tfidf.inc_doc_num()
 
-        word_list=list(set(doc_text.split()))
-
-        for word in word_list:
-            if word in article_word_dict.keys():
-                article_word_dict[word]=article_word_dict.get(word) + 1
-            else:
-                article_word_dict[word] = 1
+    # Print result to text file
+    article_word_dict = topic_tfidf.return_word_dict(word_list)
+    text_file = open('NYT_word_dict.txt','w')
+    text_file.write(str(article_word_dict))
 
 def trainTopicEngine (article_list):
 
@@ -81,6 +77,4 @@ def findTopic (textInput):
 
 def matchTopic (hashtags):
 	return hashtags
-
-preprocessTopicEngine()
 
