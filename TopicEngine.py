@@ -4,7 +4,12 @@
 
 import requests
 import json
+import numpy
+import TextParser
+import random
 
+# scrapeNYT takes New York Times articles and prepares it for tf-idf  by create a list of 
+# article text that represent specific documents and stores this in a text file.
 
 def scrapeNYT ():
 
@@ -13,20 +18,18 @@ def scrapeNYT ():
     url = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?'
     api_key = '13bc65215e7fbc5d2ca01f022ee68cf7:1:67898892'
     search_date = 20150415
-    date_range = 10
+    date_range = 1
 
     # New York Times API limits API return calls to 10 results per call and up to 100 page flips.
     # Strategy is to take the total number of articles found in one day, rip through 100 pages, 
     # then move onto the next day for a given range.
-
-    # Good way to iterate through dates? Convert JSON to dict? Parsing through JSON?
 
     article_list = []
 
     while date_range > 0:
 
         #iterate through page numbers
-        for i in range(1,2): #change to 100 when ready
+        for i in range(1,100): #change to 100 when ready
             response = requests.get(url+'&begin_date='+str(search_date)+'&end_date='+
                 str(search_date)+'&fl=lead_paragraph'+'&page='+str(i)+'&api-key='+api_key)
             response_data = response.json()
@@ -36,45 +39,65 @@ def scrapeNYT ():
             if response_data['response']['meta']['hits'] == 0:
                 break
             else:
-                article_text=response_data['response']['docs']
-                article_list.append(article_text)
+                for doc in response_data['response']['docs']:
+                    article_text = doc['lead_paragraph']
+                    if article_text != None:
+                        article_list.append(article_text)
 
         #iterate through dates
         date_range -=1 
         search_date -=1
 
     # Print result to text file
-    text_file = open('NYT_articles.txt','a')
+    text_file = open('NYT_articles.txt','w')
     text_file.write(str(article_list))
 
+# preprocessTopicEngine takes in the name to a text file that contains article text
 
-# Will return article_list as a dict with word occurrence count across the corpus
-def preprocessTopicEngine (topic_tfidf):
+def preprocessTopicEngine (topic_tfidf,text_file):
+
+    # Print result to text file
+
+    topic_tfidf.return_article_dict(article_list)
+    topic_tfidf.return_tfidf_dict()
+
+    text_file = open('NYT_tfidf_dict.txt','w')
+    text_file.write(str(topic_tfidf.tfidf_dict))
+
+def GibbsSampling():
+
+    doc_list = []
+    topic_num = 1000
+    iter_num = 1000
 
     #dict that stores each word and the number of occurrences
 
     article_list = eval(open('NYT_articles.txt','r').read())
-    word_list = []
-
     for doc in article_list:
-        # I know this is ugly - will fix
-        doc_text = str(doc[0]['lead_paragraph'])
-        if doc_text != "None":
-            word_list = word_list + topic_tfidf.return_word_list (doc_text)
-            topic_tfidf.inc_doc_num()
+        doc_list.append(TextParser.return_word_list(doc))
+    print doc_list
 
-    # Print result to text file
-    article_word_dict = topic_tfidf.return_word_dict(word_list)
-    text_file = open('NYT_word_dict.txt','w')
-    text_file.write(str(article_word_dict))
+    #initiate first guess for all the words
 
-def trainTopicEngine (article_list):
+    vocab = eval(open('NYT_tfidf_dict.txt','r').read())
 
-	return args
+    for word in vocab:
+        vocab[word] = random.randint(0,topic_num-1) 
 
-def findTopic (textInput):
-	return textInput
+    #iterate to adjust guess
 
-def matchTopic (hashtags):
-	return hashtags
+    while iter_num > 0:
+        for doc in doc_list:
+            word_count_dict = {w:doc.count(w) for w in doc}
+            doc_length = sum(word_count_dict.values())
+            for w in word_count_dict:
+                word_count_dict.get(w)/doc_length
+            prob_t_d = 2 #probability that topic is in the document
 
+        iter_num -= 1
+
+
+
+# runs collapsed Gibbs Sampling
+
+GibbsSampling()

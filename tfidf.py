@@ -1,63 +1,58 @@
 #Ranks the hashtags of relevant users
 
-import TopicEngine
-import TwitterCalls
 import math
+import TextParser
 
 class tfidf(object):
 
 	def __init__ (self):
 		self.doc_num = 0
+		self.word_list = []
+		self.word_dict = {}
+		self.tfidf_dict = {}
+		self.term_freq_dict = {}
+		self.word_num = 0
 
 	# Returns inverse document frequency
 
 	def inc_doc_num (self):
 		self.doc_num += 1
 
-	def return_word_list (self,text):
+	def return_article_dict (self,article_list):
+		for doc in article_list:
+			TextParser.word_list = TextParser.word_list + list(set(TextParser.return_word_list (doc)))
+			self.inc_doc_num()
 
-		text = text.replace('.',' ').replace('!', ' ').replace('?', ' ').replace('-', ' ') \
-	        .replace('%', ' ').replace("'s"," ").replace('(',' ').replace(')',' ').replace('0', ' ') \
-	        .replace('1', ' ').replace('2', ' ').replace('3', ' ').replace('4', ' ') .replace('5', ' ') \
-	        .replace('6', ' ').replace('7', ' ').replace('8', ' ').replace('9', ' ').replace('"',' ')
-
-	        #remove duplicates
-	        word_list=list(set(text.split()))
-		return word_list
-
-	def return_word_dict (self,word_list):
-		article_word_dict={}
-
-		for word in word_list:
-			if word in article_word_dict.keys():
-				article_word_dict[word]=article_word_dict.get(word) + 1
+		for word in self.word_list:
+			if word in self.word_dict.keys():
+				self.word_dict[word] = self.word_dict.get(word) + 1
 			else:
-				article_word_dict[word] = 1
-		
-		return article_word_dict
+				self.word_dict[word] = 1
 
 	def inv_doc_freq (self,term,doc_num):
 
-		article_word_dict = eval(open('NYT_word_dict.txt','r').read())
-		article_count = article_word_dict.get(term)
-		
-		if article_count != None:
-			return math.log(doc_num/article_count)
-		else 
+		doc_count = self.word_dict.get(term)
 
+		if doc_count != None:
+			return math.log(doc_num/doc_count)
+		else:
+			return None
 
+	def return_term_freq_dict (self,text,tfidf):
 
+		word_list = self.return_word_list(text)
 
-	# def rankUsers (tweetStream):
-	# 	TwitterCalls.followers(())
-	# 	return tweetStream
+		for word in word_list:
+			if word in self.word_dict.keys():
+				self.word_dict[word]=self.word_dict.get(word) + 1
+				self.word_num += 1
+			else:
+				self.word_dict[word]=1
+				self.word_num += 1
 
-	# def pullHashTags (tweetStream):
-	# 	return tweetStream
+		for word in word_dict:
+			self.term_freq_dict[word] = self.word_dict.get(word) * tfidf.tfidf_dict.get(word)
 
-	# def runtfidf (hashtags):
-	# 	return hashtags
-
-	# def matchTopic (hashtags):
-	# 	topic = TopicEngine.matchTopic(hashtags)
-	# 	return topic
+	def return_tfidf_dict (self):
+		for key in self.word_dict:
+			self.tfidf_dict[key] = self.inv_doc_freq (key,self.doc_num)
