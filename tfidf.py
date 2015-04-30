@@ -12,6 +12,7 @@ class tfidf(object):
 		self.tfidf_dict = {}
 		self.term_freq_dict = {}
 		self.word_num = 0
+		self.doc_word_list = []
 
 	# Returns inverse document frequency
 
@@ -19,15 +20,26 @@ class tfidf(object):
 		self.doc_num += 1
 
 	def return_article_dict (self,article_list):
-		for doc in article_list:
-			TextParser.word_list = TextParser.word_list + list(set(TextParser.return_word_list (doc)))
-			self.inc_doc_num()
+
+		# find unique words
+
+		for doc in list(article_list):
+			if doc['lead_paragraph']!=None:
+				self.word_list = self.word_list + list(set(TextParser.return_word_list (doc['lead_paragraph'])))
+				self.inc_doc_num()
 
 		for word in self.word_list:
 			if word in self.word_dict.keys():
 				self.word_dict[word] = self.word_dict.get(word) + 1
 			else:
 				self.word_dict[word] = 1
+
+		# find document word sets
+
+		for doc in list(article_list):
+			if doc['lead_paragraph']!=None:
+				self.doc_word_list.append(TextParser.return_word_list(doc['lead_paragraph']))
+		print self.doc_word_list[1]
 
 	def inv_doc_freq (self,term,doc_num):
 

@@ -24,15 +24,21 @@ def getBodyText (url):
 
 # getBodyText('http://techcrunch.com/2015/04/25/the-marijuana-industry-and-its-first-crossroads/#.m3hlzq:aTae')
 
+def fixArticleText(text):
+
+	text = text.replace("][",',')
+	text_file = open('NYT_articles.txt','w')
+	text_file.write(str(text))
+
 def return_word_list (text):
 
 	text = text.replace('.',' ').replace('!', ' ').replace('?', ' ').replace('-', ' ') \
-        .replace('%', ' ').replace("'s"," ").replace('(',' ').replace(')',' ').replace('0', ' ') \
-        .replace('1', ' ').replace('2', ' ').replace('3', ' ').replace('4', ' ') .replace('5', ' ') \
-        .replace('6', ' ').replace('7', ' ').replace('8', ' ').replace('9', ' ').replace('"',' ') \
-        .replace(u'\u201d', ' ').replace(u'\u201c', ' ').replace(u'\u2014',' ').replace(u'\u2019',' ')
+		.replace('%', ' ').replace("'s"," ").replace('(',' ').replace(')',' ').replace('0', ' ') \
+		.replace('1', ' ').replace('2', ' ').replace('3', ' ').replace('4', ' ') .replace('5', ' ') \
+		.replace('6', ' ').replace('7', ' ').replace('8', ' ').replace('9', ' ').replace('"',' ') \
+		.replace(u'\u201d', ' ').replace(u'\u201c', ' ').replace(u'\u2014',' ').replace(u'\u2019',' ') 
 
-        #remove duplicates
-        word_list=text.split()
+	#remove duplicates
+	word_list=text.split()
 
 	return word_list

@@ -13,13 +13,17 @@ topic_tfidf = tfidf()
 
 if argv[1] == "train":
 
-	# Get a list of text bodies to pass into the tfidf engine
-	TopicEngine.scrapeNYT()
+	# Get a list of text bodies to pass into the tfidf engine, already scraped
+	# TopicEngine.scrapeNYT()
+
+	# Format scarped text, already formatted
+	article_text = open("NYT_articles.txt","r").read()
+	TextParser.fixArticleText(article_text)
 
 	# Get a tfidf for pre-processing for topic engine
 	TopicEngine.preprocessTopicEngine(topic_tfidf,"NYT_articles.txt")
 
-	print "topic_training_complete"
+	TopicEngine.GibbsSampling(topic_tfidf.doc_word_list)
 
 else:
 
