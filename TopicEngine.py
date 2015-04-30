@@ -66,25 +66,57 @@ def preprocessTopicEngine (topic_tfidf,text_file):
     # text_file = open('NYT_tfidf_dict.txt','w')
     # text_file.write(str(topic_tfidf.tfidf_dict))
 
+def resample(doc,word,topics,n_wt,n_wdt,n_t,n_i,doc_num):
+    alpha = 0.5
+    beta = 0.5
+    topic = topics[doc][word]
+
+    n_wt[topic][vocab_list.index((doc_list[doc])[word])]-=1
+    n_wdt[doc][topic]-=1
+    n_t[topic]-=1
+    n_i[doc]-=1
+
+    p = [0]*topic_num
+    for t in range(topic_num):
+        p[t]=(n_wt[t][vocab_list.index((doc_list[doc])[word])] + beta) \
+        / (n_t[t] + vocab_num * beta) * (n_wdt[doc][t] + alpha) \
+        / (n_i[doc] + topic_num * alpha)
+
+    # for t in range(1,len(p)):
+    #     p[t] += p[t - 1]
+
+    for t in range(len(p)):
+        if ((random.randint(0,topic_num-1) * p[t - 1])<p[t]):
+            break
+
+    n_wt[topic][vocab_list.index((doc_list[doc])[word])]+=1
+    n_wdt[doc][topic]+=1
+    n_t[topic]+=1
+    n_i[doc]+=1
+
+    return t
+
+
 def GibbsSampling(docs):
 
     doc_list = docs
     topic_dict = {}
-    vocab_dict = {}
-    topic_num = 1000
+    topic_num = 5
     iter_num = 10
     doc_num = len(doc_list)
-    alpha = 0.5
-    beta = 0.5
+
 
     vocab = eval(open ('NYT_tfidf_dict.txt','r').read())
+    vocab_list = vocab.keys()
     vocab_num = len(vocab)
+
 
     # Needed count variables
 
-    # Number of words in topic t
-    n_wt = numpy.zeros(vocab_num, topic_num)
-    n_wdt = numpy.zeros(doc_num)
+    # Number of words w in topic t
+    n_wt = numpy.zeros((topic_num,vocab_num))
+    # Number of words in doc i that are in topic t
+    n_wdt = numpy.zeros((doc_num,topic_num))
     n_t = [0]*topic_num
     n_i = [0]*doc_num
 
@@ -93,15 +125,39 @@ def GibbsSampling(docs):
     # for doc in doc_list:
     #     doc_list.append(TextParser.return_word_list(doc))
 
-    # #initiate first guess for all the words
+    # Initiate first guess for all the words
+    # Create an indexed collection of topics
+    topics = []
+    for doc in range(doc_num):
+        topic_list = []
+        doc_length = len(doc_list[doc])
+        topics.append([0]*doc_length)
+        for word in range(doc_length):
+            topic = random.randint(0,topic_num-1)
+            topic_list = topic_list + [topic]
 
-    for word in vocab:
-        vocab_dict[word] = random.randint(0,topic_num-1)
+            # Increment counts
+            if (doc_list[doc])[word] in vocab_list:
+                topics[doc][word]=topic
+                n_wt[topic][vocab_list.index((doc_list[doc])[word])]+=1
+                n_wdt[doc][topic]+=1
+                n_t[topic]+=1
+                n_i[doc]+=1
 
-    for doc in doc_list:
-        for word in doc:
-            topic = vocab_dict.get(word)
-            return topic
+    # Iterate to improve on probabilities
+    for i in range(iter_num):
+        # for all words, readjust topic
+        for doc in range(doc_num):
+            doc_length = len(doc_list[doc])
+            for word in range(doc_length):
+                topic = resample(doc,word,topics,n_wt,n_wdt,n_t,n_i,doc_num)
+                topics[doc][word]=topic
+
+    print topics
+
+
+
+
 
 
     # for t in range(0,topic_num-1):
@@ -129,5 +185,3 @@ def GibbsSampling(docs):
 
 
 # runs collapsed Gibbs Sampling
-
-# GibbsSampling()

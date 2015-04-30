@@ -17,8 +17,8 @@ if argv[1] == "train":
 	# TopicEngine.scrapeNYT()
 
 	# Format scarped text, already formatted
-	article_text = open("NYT_articles.txt","r").read()
-	TextParser.fixArticleText(article_text)
+	# article_text = open("NYT_articles.txt","r").read()
+	# TextParser.fixArticleText(article_text)
 
 	# Get a tfidf for pre-processing for topic engine
 	TopicEngine.preprocessTopicEngine(topic_tfidf,"NYT_articles.txt")
