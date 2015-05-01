@@ -1,0 +1,47 @@
+--------------------------------------------------------------
+INTERFACE
+--------------------------------------------------------------
+
+ArticleRecommender.py - The user should only interact with this file
+
+--------------------------------------------------------------
+SETTING UP YOUR ENVIRONMENT
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+1. TRAINING THE TOPIC ENGINE (CODE COMES PRE-TRAINED)
+--------------------------------------------------------------
+
+The code comes pre-trained so the user does not have to train the topic engine before getting recommendation results.
+This section is provided in case the user wants to re-train the engine, although this will take a while to process.
+
+ArticleRecommender.py responds differently based on the first argument provided. Possible options include "NYT" "train" or "".
+
+"NYT" indicates that the user wants to add documents to the document collection. The engine is currently trained off NYT
+articles published between 4/1/2015 and 4/15/2015. If the user selects "NYT," they must specify what date range they 
+want to add to the document collection. Be aware that the New York Times API limits daily calls to 10,000 entries.
+
+NOTE THAT RUNNING THE NYT SCRAPER WILL ERASE THE EXISTING DOCUMENTS ALREADY LOADED INTO THE SYSTEM. 
+THIS OPERATION IS TIME CONSUMING DUE TO THE NEED TO MAKE MULTIPLE API CALLS TO BYPASS API RESTRICTIONS.
+
+In the command prompt:
+
+python ArticleRecommender.py NYT YYYYMMDD int --> YYYYMMDD should be the beginning date, int should represent the number of days 
+to include after the beginning date
+
+"train" indicates that the user wants to run the topic engine to model the collection of NYT documemnts. Note that if the user
+adds documents using "NYT," they should also re-train the engine to encompass the new document additions. Again, this operation is
+very time-consuming.
+
+--------------------------------------------------------------
+2. GETTING AN ARTICLE SUGGESTION
+--------------------------------------------------------------
+
+The article suggestion portion relies on pulling from pre-processed printed text to calculate tf-idf and topic modeling due to
+the heavy computation required to train the engine.
+
+In the command prompt:
+
+python ArticleRecommender.py url "text" --> no formatting checks on this, it is entirely on the user to use this correctly.
+
+
