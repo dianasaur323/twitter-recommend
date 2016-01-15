@@ -6,6 +6,7 @@ import base64
 import requests
 import json
 import gzip
+import TextParser
 
 from DataStructures import TwitterPost
 
@@ -106,12 +107,11 @@ def userStream(tweets):
 		response = requests.get(url,headers=authorizedHeader,params=params)
 		response_data = response.json()
 		for doc in response_data:
-			for doc in (doc['entities'])['hashtags']:
-				print doc['text']
+			print doc['text']
 
 	return user_list
 
-userStream(findArticlePosters('www.newyorker.com'))
+
 
 
 

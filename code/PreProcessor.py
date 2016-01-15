@@ -26,7 +26,7 @@ def scrapeNYT (begin_date,length):
     while date_range > 0:
 
         #iterate through page numbers
-        for i in range(1,100): 
+        for i in range(1,5): 
             response = requests.get(url+'&begin_date='+str(search_date)+'&end_date='+
                 str(search_date)+'&fl=lead_paragraph'+'&page='+str(i)+'&api-key='+api_key)
             response_data = response.json()

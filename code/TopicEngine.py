@@ -23,7 +23,7 @@ class TopicEngine(object):
         self.beta = 0.5
 
         self.topic_num = 100
-        self.iter_num = 100
+        self.iter_num = 50 #too few, but takes too long to run
 
         self.theta_sum = numpy.zeros((self.doc_num, self.topic_num))
         self.phi_sum = numpy.zeros((self.topic_num, self.vocab_num))
@@ -79,8 +79,20 @@ class TopicEngine(object):
 
         for t in range(self.topic_num):
             for w in range(self.vocab_num):
-                self.phi_sum[t][w] += (self.n_wt[t][self.vocab.index((self.doc_list[doc])[w])] + self.beta) \
+                self.phi_sum[t][w] += (self.n_wt[t][self.vocab.index(self.vocab[w])] + self.beta) \
                 / (self.n_t[t] + self.vocab_num * self.beta)
+
+        self.stats_num +=1
+
+    def get_theta(self):
+        self.theta = self.theta_sum / self.stats_num
+        self.phi = self.phi_sum / self.stats_num
+
+        text_file = open('theta.txt','w')
+        text_file.write(str(self.theta))
+
+        text_file = open('phi.txt','w')
+        text_file.write(str(self.phi))
 
     def GibbsSampling(self):
 
@@ -123,16 +135,14 @@ class TopicEngine(object):
         # print topics to document
         text_file = open('topics.txt','w')
         text_file.write(str(self.topics))
+        numpy.save('n_wt',self.n_wt)
+        numpy.save('n_t',self.n_t)
+        numpy.save('n_wdt',self.n_wdt)
 
-    def get_theta(self):
-        self.theta = self.theta_sum / self.stats_num
-        self.phi = self.phi_sum / self.stats_num
+        self.get_theta()
 
-        text_file = open('theta.txt','w')
-        text_file.write(str(self.theta))
 
-        text_file = open('phi.txt','w')
-        text_file.write(str(self.phi))
+
 
 
 

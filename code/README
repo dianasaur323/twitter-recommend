@@ -8,6 +8,8 @@ ArticleRecommender.py - The user should only interact with this file
 SETTING UP YOUR ENVIRONMENT
 --------------------------------------------------------------
 
+You may need to set up numpy and requests
+
 --------------------------------------------------------------
 1. TRAINING THE TOPIC ENGINE (CODE COMES PRE-TRAINED)
 --------------------------------------------------------------
@@ -18,7 +20,7 @@ This section is provided in case the user wants to re-train the engine, although
 ArticleRecommender.py responds differently based on the first argument provided. Possible options include "NYT" "train" or "".
 
 "NYT" indicates that the user wants to add documents to the document collection. The engine is currently trained off NYT
-articles published between 4/1/2015 and 4/15/2015. If the user selects "NYT," they must specify what date range they 
+articles published between 4/1/2015 and 4/15/2015 that appear on the first 5 pages. If the user selects "NYT," they must specify what date range they 
 want to add to the document collection. Be aware that the New York Times API limits daily calls to 10,000 entries.
 
 NOTE THAT RUNNING THE NYT SCRAPER WILL ERASE THE EXISTING DOCUMENTS ALREADY LOADED INTO THE SYSTEM. 
@@ -33,6 +35,9 @@ to include after the beginning date
 adds documents using "NYT," they should also re-train the engine to encompass the new document additions. Again, this operation is
 very time-consuming.
 
+Once done training, the user can view the results in topic.txt, although this requires a hashmap to figure out what word is associated
+with each item in the array.
+
 --------------------------------------------------------------
 2. GETTING AN ARTICLE SUGGESTION
 --------------------------------------------------------------
@@ -44,4 +49,8 @@ In the command prompt:
 
 python ArticleRecommender.py url "text" --> no formatting checks on this, it is entirely on the user to use this correctly.
 
+System returns a stream of tweets from users who posted about the topic of the article. The user can then go through and search for 
+any relevant article links.
+
+If you get a no JSON error, it is likely because your url did not come up with any search results. Try a different url.
 

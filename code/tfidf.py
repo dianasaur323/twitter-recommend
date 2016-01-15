@@ -14,10 +14,12 @@ class tfidf(object):
 		self.inv_doc_dict = {} # idf dict
 		self.word_num = 0
 		self.doc_word_list = [] # List of documents made up of list of words
+		self.doc_word_list2 = [] # parsing error, so needed to make another one
 
 	# Function to count document number
 	def inc_doc_num (self):
 		self.doc_num += 1
+
 
 	# Given a list of documents, return a dictionary that counts the number of word occurrences
 	def return_doc_dict (self,doc_list):
@@ -29,6 +31,7 @@ class tfidf(object):
 				self.word_list = self.word_list + list(set(parsedText))
 				self.word_list_total = self.word_list_total + parsedText
 				self.doc_word_list.append(parsedText)
+				self.doc_word_list2.append([parsedText])
 				self.inc_doc_num() #count number of documents
 
 
@@ -48,6 +51,8 @@ class tfidf(object):
 		text_file.write(str(self.doc_word_list))
 		text_file = open('word_dict.txt','w')
 		text_file.write(str(self.word_dict))
+		text_file = open('doc_word_list2.txt','w')
+		text_file.write(str(self.doc_word_list2))
 		
 		self.word_num = len(self.word_list_total)
 
@@ -90,7 +95,6 @@ class new_tfidf(tfidf):
 	# define additional functions to pull in tf-idf results from text
 	def __init__(self):
 		self.inv_doc_dict = eval(open('inv_doc_dict.txt','r').read())
-		print self.inv_doc_dict
 		self.word_dict = eval(open('word_dict.txt','r').read())
 		self.doc_num = len(eval(open('doc_word_list.txt','r').read()))
 
